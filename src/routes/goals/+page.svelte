@@ -11,15 +11,18 @@
     achievedValue: number;
   };
 
-  // Typisierung der Daten, die vom Server kommen
   type PageData = {
     goals: Goal[];
   };
 
-  // getypte Übergabe der Daten vom Load-Function
   export let data: PageData;
-
   const goals = data.goals;
+
+  // Berechne Fortschritt in Prozent (max. 100)
+  function getProgress(goal: Goal): number {
+    if (!goal.targetValue || goal.targetValue <= 0) return 0;
+    return Math.min(100, Math.round((goal.achievedValue / goal.targetValue) * 100));
+  }
 
   function handleDelete(event: SubmitEvent) {
     event.preventDefault();
@@ -184,10 +187,10 @@
 
           <div class="progress-bar-bg">
             <div
-              class="progress-bar-fill {goal.status === 'abgeschlossen' ? 'progress-green' : 'progress-yellow'}"
-              style="width: {goal.achievedValue}%"
+              class="progress-bar-fill {getProgress(goal) >= 100 ? 'progress-green' : 'progress-yellow'}"
+              style="width: {getProgress(goal)}%"
             >
-              {goal.achievedValue}%
+              {getProgress(goal)}%
             </div>
           </div>
 
@@ -197,9 +200,10 @@
               <input type="hidden" name="id" value={goal._id} />
               <button type="submit">Löschen</button>
             </form>
-          </div>git config --global user.email "your_email" git config --global user.name "your_username"
+          </div>
         </div>
       {/each}
     </div>
   {/if}
 </main>
+  
