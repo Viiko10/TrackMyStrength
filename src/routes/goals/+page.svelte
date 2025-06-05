@@ -18,6 +18,13 @@
   export let data: PageData;
   const goals = data.goals;
 
+  // Status-Filter
+  let selectedStatus: string = 'alle';
+
+  function matchesStatus(goal: Goal): boolean {
+    return selectedStatus === 'alle' || goal.status.toLowerCase() === selectedStatus;
+  }
+
   // Berechne Fortschritt in Prozent (max. 100)
   function getProgress(goal: Goal): number {
     if (!goal.targetValue || goal.targetValue <= 0) return 0;
@@ -87,7 +94,7 @@
 
   h1 {
     text-align: center;
-    margin-bottom: 2rem;
+    margin-bottom: 1rem;
   }
 
   .goal-card {
@@ -159,6 +166,27 @@
   .text-gray-600 {
     color: #ccc;
   }
+
+  .filter-select {
+    margin: 0 auto 2rem auto;
+    text-align: center;
+  }
+
+  label[for="statusFilter"] {
+    color: white;
+    font-weight: bold;
+    margin-right: 0.5rem;
+  }
+
+  select {
+    padding: 0.4rem 0.8rem;
+    border-radius: 6px;
+    border: 1px solid #00FF00;
+    font-size: 1rem;
+    background-color: white;
+    color: black;
+    outline: none;
+  }
 </style>
 
 <!-- NAVIGATION -->
@@ -174,11 +202,21 @@
 <main>
   <h1 class="text-3xl font-bold">Meine Ziele</h1>
 
-  {#if goals.length === 0}
-    <p class="text-gray-600 text-center">Noch keine Ziele erfasst.</p>
+  <div class="filter-select">
+    <label for="statusFilter">Status filtern:</label>
+    <select id="statusFilter" bind:value={selectedStatus}>
+      <option value="alle">Alle</option>
+      <option value="active">active</option>
+      <option value="completed">completed</option>
+      <option value="paused">paused</option>
+    </select>
+  </div>
+
+  {#if goals.filter(matchesStatus).length === 0}
+    <p class="text-gray-600 text-center">Keine Ziele für diese Auswahl.</p>
   {:else}
     <div>
-      {#each goals as goal}
+      {#each goals.filter(matchesStatus) as goal}
         <div class="goal-card">
           <h2>{goal.title}</h2>
           <p>{goal.description}</p>
@@ -206,4 +244,4 @@
     </div>
   {/if}
 </main>
-  
+
